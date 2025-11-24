@@ -3674,7 +3674,7 @@ static int readdir_fill(struct fuse *f, fuse_req_t req, fuse_ino_t ino,
 }
 
 static int readdir_fill_from_list(fuse_req_t req, struct fuse_dh *dh,
-				  off_t off, enum fuse_readdir_flags flags)
+				  off_t off)
 {
 	off_t pos;
 	struct fuse_direntry *de = dh->first;
@@ -3698,14 +3698,13 @@ static int readdir_fill_from_list(fuse_req_t req, struct fuse_dh *dh,
 		unsigned newlen;
 		pos++;
 
-		if (flags & FUSE_READDIR_PLUS) {
+		if (de->flags & FUSE_FILL_DIR_PLUS) {
 			struct fuse_entry_param e = {
 				.ino = 0,
 				.attr = de->stat,
 			};
 
-			if (de->flags & FUSE_FILL_DIR_PLUS &&
-			    !is_dot_or_dotdot(de->name)) {
+			if (!is_dot_or_dotdot(de->name)) {
 				res = do_lookup(dh->fuse, dh->nodeid,
 						de->name, &e);
 				if (res) {
@@ -3753,7 +3752,7 @@ static void fuse_readdir_common(fuse_req_t req, fuse_ino_t ino, size_t size,
 	}
 	if (dh->filled) {
 		dh->needlen = size;
-		err = readdir_fill_from_list(req, dh, off, flags);
+		err = readdir_fill_from_list(req, dh, off);
 		if (err) {
 			reply_err(req, err);
 			goto out;
