@@ -807,6 +807,7 @@ def tst_readdir_big(src_dir, mnt_dir):
     assert inodes_is == inodes_should
 
     for fname in fnames:
+        # A comment just to get a diff
         stat_src = os.stat(pjoin(src_dir, fname))
         stat_mnt = os.stat(pjoin(mnt_dir, fname))
         assert stat_src.st_ino == stat_mnt.st_ino
